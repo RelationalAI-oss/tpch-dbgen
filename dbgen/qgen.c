@@ -147,10 +147,9 @@ strip_comments(char *line)
 void
 qsub(char *qtag, int flags)
 {
-static char *line = NULL,
-    *qpath = NULL;
-FILE *qfp;
-char *cptr,
+    static char *line = NULL, *qpath = NULL, *qoutpath = NULL;
+    FILE *qfp;
+    char *cptr,
     *mark,
     *qroot = NULL;
 
@@ -159,14 +158,18 @@ char *cptr,
         {
         line = malloc(BUFSIZ);
         qpath = malloc(BUFSIZ);
+        qoutpath = malloc(BUFSIZ);
         MALLOC_CHECK(line);
         MALLOC_CHECK(qpath);
+        MALLOC_CHECK(qoutpath);        
         }
 
     qroot = env_config(QDIR_TAG, QDIR_DFLT);
-    sprintf(qpath, "%s%c%s.sql", 
-		qroot, PATH_SEP, qtag);
+    sprintf(qpath, "%s%c%s.sql", qroot, PATH_SEP, qtag);
+    sprintf(qoutpath, "%s%c%s.sql", query_output_dir, PATH_SEP, qtag);
+    
     qfp = fopen(qpath, "r");
+    ofp = fopen(qoutpath, "w");    
     OPEN_CHECK(qfp, qpath);
 
     rowcnt = rowcnt_dflt[qnum];
@@ -180,8 +183,20 @@ char *cptr,
         mark = line;
         while ((cptr = strchr(mark, VTAG)) != NULL)
             {
+              // Substitute syntax is @@c
+              if (strlen(mark) < (cptr - mark + 1) || cptr[1] != VTAG)
+                {
+                  printf("!!%.*s", cptr - mark + 2, mark);
+                  mark = cptr;
+                  continue;
+                }
+            // Nul terminate the prefix for printing
             *cptr = '\0';
-             cptr++;
+            // Skip over the nul (which was the VTAG)
+            cptr++;
+            // Skip over the second VTAG
+            cptr++;             
+            // Print the prefix of the string
             fprintf(ofp,"%s", mark);
             switch(*cptr)
                 {
@@ -189,7 +204,7 @@ char *cptr,
                 case 'B':
                     if (!(flags & ANSI))
                         fprintf(ofp,"%s\n", START_TRAN);
-                    cptr++;
+                    cptr++;                    
                     break;
                 case 'c':
                 case 'C':
@@ -235,23 +250,23 @@ char *cptr,
                         fprintf(ofp, "%s\n", GEN_QUERY_PLAN);
                     cptr++;
                     break;
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
                     varsub(qnum, atoi(cptr), flags & DFLT);
                     while (isdigit(*++cptr));
                     break;
                 default:
-		    fprintf(stderr, "-- unknown flag '%c%c' ignored\n", 
+                  fprintf(stderr, "// unknown flag '%c%c' ignored\n", 
                         VTAG, *cptr);
-		    cptr++;
-		    break;
+                  cptr++;
+                  break;
                 }
             mark=cptr;
             }
@@ -259,6 +274,9 @@ char *cptr,
         }
     fclose(qfp);
     fflush(stdout);
+    fflush(ofp);
+    fclose(ofp);    
+    ofp = stdout;
     return;
 }
 
@@ -294,7 +312,7 @@ process_options(int cnt, char **args)
 {
     int flag;
 
-    while((flag = getopt(cnt, args, "ab:cdhi:n:Nl:o:p:r:s:t:vx")) != -1)
+    while((flag = getopt(cnt, args, "ab:cdhi:n:Nl:o:Q:p:r:s:t:vx")) != -1)
         switch(flag)
             {
             case 'a':   /* use ANSI semantics */
@@ -341,6 +359,11 @@ process_options(int cnt, char **args)
                 MALLOC_CHECK(osuff);
                 strcpy(osuff, optarg);
                 flags |=OUTPUT;
+                break;
+            case 'Q':   /* set the output path */
+                query_output_dir = malloc((int)strlen(optarg) + 1);
+                MALLOC_CHECK(query_output_dir);
+                strcpy(query_output_dir, optarg);
                 break;
             case 'p':   /* permutation for a given stream */
                 snum = atoi(optarg);
