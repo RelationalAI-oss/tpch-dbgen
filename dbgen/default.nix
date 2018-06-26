@@ -6,7 +6,17 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/bin
     cp -R . $out/tpch
-    ln -s $out/tpch/dbgen $out/bin/dbgen
-    ln -s $out/tpch/qgen $out/bin/qgen
+    cat > $out/bin/dbgen <<EOF
+    #! /bin/sh
+    cd $out/tpch
+    exec ./dbgen \$@
+    EOF
+    cat > $out/bin/cgen <<EOF
+    #! /bin/sh
+    cd $out/tpch
+    exec ./cgen \$@
+    EOF
+    chmod u+x $out/bin/*
+
   '';
 }
