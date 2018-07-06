@@ -11,10 +11,10 @@ stdenv.mkDerivation {
     cd $out/tpch
     exec ./dbgen \$@
     EOF
-    cat > $out/bin/cgen <<EOF
+    cat > $out/bin/qgen <<EOF
     #! /bin/sh
     cd $out/tpch
-    exec ./cgen \$@
+    exec ./qgen \$@
     EOF
     chmod u+x $out/bin/*
 
