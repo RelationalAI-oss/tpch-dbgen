@@ -186,7 +186,9 @@ qsub(char *qtag, int flags)
               // Substitute syntax is @@c
               if (strlen(mark) < (cptr - mark + 1) || cptr[1] != VTAG)
                 {
-                  printf("!!%.*s", cptr - mark + 2, mark);
+                  printf("%.*s", cptr - mark + 2, mark);
+                  cptr++;
+                  cptr++;                  
                   mark = cptr;
                   continue;
                 }
