@@ -2,7 +2,7 @@
 stdenv.mkDerivation {
   name = "tpch-dbgen-delve";
   src = ./.;
-  makeFlags = "CC=cc";
+  makeFlags = "CC=cc MACHINE=${if stdenv.isDarwin then "MAC" else "LINUX"}";
   installPhase = ''
     mkdir -p $out/bin
     cp -R . $out/tpch
@@ -17,6 +17,5 @@ stdenv.mkDerivation {
     exec ./qgen \$@
     EOF
     chmod u+x $out/bin/*
-
   '';
 }
