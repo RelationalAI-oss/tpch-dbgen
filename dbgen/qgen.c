@@ -448,7 +448,7 @@ int main(int ac, char **av)
     process_options(ac, av);
     if (flags & VERBOSE)
         fprintf(ofp, 
-	    "-- TPC %s Parameter Substitution (Version %d.%d.%d build %d)\n",
+	    "// TPC %s Parameter Substitution (Version %d.%d.%d build %d)\n",
             NAME, VERSION, RELEASE, PATCH, BUILD);
 
     setup();
@@ -465,10 +465,10 @@ int main(int ac, char **av)
 			Seed[0].value = NextRand(Seed[0].value);
 			Seed[i].value = Seed[0].value;
 			}
-		printf("-- using %ld as a seed to the RNG\n", rndm);
+		printf("// using %ld as a seed to the RNG\n", rndm);
 		}
     else
-        printf("-- using default substitutions\n");
+        printf("// using default substitutions\n");
     
     if (flags & INIT)           /* init stream with ifile */
         {
