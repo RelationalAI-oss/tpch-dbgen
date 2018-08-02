@@ -169,7 +169,12 @@ qsub(char *qtag, int flags)
     sprintf(qoutpath, "%s%c%s.sql", query_output_dir, PATH_SEP, qtag);
     
     qfp = fopen(qpath, "r");
-    ofp = fopen(qoutpath, "w");    
+    if(query_output_dir == NULL) {
+        ofp = stdout;
+    } else {
+        ofp = fopen(qoutpath, "w");
+    }
+
     OPEN_CHECK(qfp, qpath);
 
     rowcnt = rowcnt_dflt[qnum];
