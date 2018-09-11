@@ -6,15 +6,15 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/bin
     cp -R . $out/tpch
-    cat > $out/bin/dbgen <<EOF
+    cat > $out/bin/dbgen-delve <<EOF
     #! /bin/sh
     cd $out/tpch
-    exec ./dbgen \$@
+    exec ./dbgen-delve \$@
     EOF
-    cat > $out/bin/qgen <<EOF
+    cat > $out/bin/qgen-delve <<EOF
     #! /bin/sh
     cd $out/tpch
-    exec ./qgen \$@
+    exec ./qgen-delve \$@
     EOF
     chmod u+x $out/bin/*
   '';
