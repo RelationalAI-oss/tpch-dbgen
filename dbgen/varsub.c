@@ -82,7 +82,7 @@ char *defaults[24][11] =
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},  /* 4 */
     {"ASIA",            "1994-01-01",           NULL,
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},  /* 5 */
-    {"1994-01-01",      ".06",                  "24",
+    {"1994-01-01",      "0.06",                  "24",
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},  /* 6 */
     {"FRANCE",          "GERMANY",              NULL,
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},  /* 7 */
