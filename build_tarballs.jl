@@ -16,9 +16,7 @@ sources = [
 script = raw"""
 cd $WORKSPACE/srcdir
 cd tpch-dbgen/dbgen
-set -x
-make CC=$CC
-set +x
+make CC="$CC"
 mkdir $prefix/tpch-dbgen
 cp -R * $prefix/tpch-dbgen/
 
