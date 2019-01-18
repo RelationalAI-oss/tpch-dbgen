@@ -1,8 +1,8 @@
 language: julia
 os:
-  - linux
+- linux
 julia:
-  - 1.0
+- 1.0
 notifications:
   email: false
 git:
@@ -10,26 +10,23 @@ git:
 cache:
   timeout: 1000
   directories:
-    - downloads
+  - downloads
 env:
   global:
-    - BINARYBUILDER_DOWNLOADS_CACHE=downloads
-    - BINARYBUILDER_AUTOMATIC_APPLE=true
+  - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+  - BINARYBUILDER_AUTOMATIC_APPLE=true
 sudo: required
-
-# Before anything else, get the latest versions of things
 before_script:
-  - julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
-
+- julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
 script:
-  - julia build_tarballs.jl
-
+- julia build_tarballs.jl
 deploy:
-    provider: releases
-    file_glob: true
-    file: products/*
-    skip_cleanup: true
-    on:
-        repo: RelationalAI-oss/tpch-dbgen
-        tags: true
-
+  provider: releases
+  api_key:
+    secure: gTqfV10rd/RZIYnog1KI1Y2uNvqFXZweRUTaqe5EZiHdk/bvQg80ruBPLGSmSFotcJ7+Q83u8TjuIjv1nodRr98hXoYzAyktQRfsaYce0NUg4sS0jJHaWd7o5I/pK/gHgAKeJfb0DW7AqIplRTukq9R7IpUSbKCWLQZUdoJE59ZPrwfDw6bh2en3NyDRr3F4A969W7NFdhCG10A1idtSYpPcit/CNAPtCBV8XTlxm1XNRZ+LBoKKBnKr03DPaBErUlC5q29uNxYvYb08pQfQxXYnLqZjVlM+8c+rBkApXBDvC6NUkCMeNG6BgYigVxIuyXqTyrD2N4VwHAaCoTBWuGB/EM2Dy4eC6qqSiib7nSAMFEOcVcjNY4rfaUbdqLEkso2+H2cxRVbfVIEgbdeElNbV88KyJidb5LH9yv9ilWm1fOin3vrtNqTtNh6EPdp6PaI+DtEpxypOXzrCD53WpFpdVTd2bPKG74sw/JALtyP2rAAYI1vXd3jzplUMpdJBO/FS6nJHGJBiUny7JLQV8VU99Ueb/Z5WrEp+WPIhZYTA1YFWUyI1Q34nbXheUAByftQFpOkxPyIJFPAso9BgO5WmNn+bsYF6D3Hw4kc6UzLs9oKxf94nag1eYP6mnb1FK2vy9/1a1xcvQ7Rl3p39ZEcpbn8cDCQAtqhLSMj8irM=
+  file_glob: true
+  file: products/*
+  skip_cleanup: true
+  on:
+    repo: RelationalAI-oss/tpch-dbgen
+    tags: true
