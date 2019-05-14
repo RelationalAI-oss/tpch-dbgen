@@ -3,23 +3,26 @@
 using BinaryBuilder
 
 name = "tpch-dbgen"
-version = v"0.0.1"
+version = v"0.0.2"
 
 # Collection of sources required to build tpch-dbgen
 sources = [
-    "https://github.com/relationalai-oss/tpch-dbgen.git" =>
-    "a60c79e047c2e464d72bc1f946d30e32d080b4e9",
-
+    ".",
 ]
 
 # Bash recipe for building across all platforms
 script = raw"""
 cd $WORKSPACE/srcdir
-cd tpch-dbgen/dbgen
+pwd
+ls -l 
+cd dbgen-delve
 make CC="$CC"
 mkdir $prefix/tpch-dbgen
 cp -R * $prefix/tpch-dbgen/
 
+cd ../dbgen
+make CC="$CC"
+cp dbgen qgen $prefix/tpch-dbgen/
 """
 
 # These are the platforms we will build for by default, unless further

@@ -100,7 +100,7 @@
 ################
 ## CHANGE NAME OF ANSI COMPILER HERE
 ################
-CC      = gcc 
+CC      = 
 # Current values for DATABASE are: INFORMIX, DB2, TDAT (Teradata)
 #                                  SQLSERVER, SYBASE, ORACLE, VECTORWISE
 # Current values for MACHINE are:  ATT, DOS, HP, IBM, ICL, MVS, 
@@ -116,7 +116,7 @@ endif
 
 WORKLOAD = TPCH
 #
-CFLAGS	= -g -DDBNAME=\"dss\" -D$(MACHINE) -D$(DATABASE) -D$(WORKLOAD) -DRNG_TEST -D_FILE_OFFSET_BITS=64 -DEOL_HANDLING 
+CFLAGS	= -g -DDBNAME=\"dss\" -D$(MACHINE) -D$(DATABASE) -D$(WORKLOAD) -DRNG_TEST -D_FILE_OFFSET_BITS=64 
 LDFLAGS = -O
 # The OBJ,EXE and LIB macros will need to be changed for compilation under
 #  Windows NT
@@ -133,8 +133,8 @@ BUILD=`grep BUILD release.h | cut -f3 -d' '`
 NEW_BUILD=`expr ${BUILD} + 1`
 TREE_ROOT=/tmp/tree
 #
-PROG1 = dbgen-delve$(EXE)
-PROG2 = qgen-delve$(EXE)
+PROG1 = dbgen$(EXE)
+PROG2 = qgen$(EXE)
 PROGS = $(PROG1) $(PROG2)
 #
 HDR1 = dss.h rnd.h config.h dsstypes.h shared.h bcd2.h rng64.h release.h
