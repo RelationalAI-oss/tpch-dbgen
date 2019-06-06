@@ -3,7 +3,7 @@
 using BinaryBuilder
 
 name = "tpch-dbgen"
-version = v"0.0.2"
+version = v"0.0.3"
 
 # Collection of sources required to build tpch-dbgen
 sources = [
