@@ -28,5 +28,5 @@ group by
 	n_name
 order by
 	revenue desc
-:n -1
+
 ;
