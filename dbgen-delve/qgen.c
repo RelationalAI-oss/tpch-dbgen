@@ -127,7 +127,7 @@ strip_comments(char *line)
 /*
  * FUNCTION qsub(char *qtag, int flags)
  *
- * based on the settings of flags, and the template file $QDIR/qtag.sql
+ * based on the settings of flags, and the template file $QDIR/qtag.delve
  * make the following substitutions to turn a query template into EQT
  *
  *  String      Converted to            Based on
@@ -165,8 +165,8 @@ qsub(char *qtag, int flags)
         }
 
     qroot = env_config(QDIR_TAG, QDIR_DFLT);
-    sprintf(qpath, "%s%c%s.sql", qroot, PATH_SEP, qtag);
-    sprintf(qoutpath, "%s%c%s.sql", query_output_dir, PATH_SEP, qtag);
+    sprintf(qpath, "%s%c%s.delve", qroot, PATH_SEP, qtag);
+    sprintf(qoutpath, "%s%c%s.delve", query_output_dir, PATH_SEP, qtag);
     
     qfp = fopen(qpath, "r");
     if(query_output_dir == NULL) {
