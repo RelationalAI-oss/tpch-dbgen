@@ -191,11 +191,11 @@
 #define SIGS_DEFINED
 #define PATH_SEP	'\\'
 #define SUPPORT_64BITS
-#define DSS_HUGE __int64
-#define RNG_A	6364136223846793005uI64
-#define RNG_C	1uI64
-#define HUGE_FORMAT "%I64d"
-#define HUGE_DATE_FORMAT "%02I64d"
+//#define DSS_HUGE __int64
+//#define RNG_A	6364136223846793005uI64
+//#define RNG_C	1uI64
+//#define HUGE_FORMAT "%I64d"
+//#define HUGE_DATE_FORMAT "%02I64d"
 /* need to define process termination codes to match UNIX */
 /* these are copied from Linux/GNU and need to be verified as part of a rework of */
 /* process handling under NT (29 Apr 98) */
