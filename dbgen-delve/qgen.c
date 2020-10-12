@@ -148,7 +148,7 @@ void
 qsub(char *qtag, int flags)
 {
     static char *line = NULL, *qpath = NULL, *qoutpath = NULL;
-    FILE *qfp;
+    FILE *qfp, *outfp;
     char *cptr,
     *mark,
     *qroot = NULL;
@@ -170,9 +170,9 @@ qsub(char *qtag, int flags)
     
     qfp = fopen(qpath, "r");
     if(query_output_dir == NULL) {
-        ofp = stdout;
+        outfp = stdout;
     } else {
-        ofp = fopen(qoutpath, "w");
+        outfp = fopen(qoutpath, "w");
     }
 
     OPEN_CHECK(qfp, qpath);
@@ -180,7 +180,7 @@ qsub(char *qtag, int flags)
     rowcnt = rowcnt_dflt[qnum];
     varsub(qnum, 0, flags); /* set the variables */
     if (flags & DFLT_NUM)
-        fprintf(ofp, SET_ROWCOUNT, rowcnt);
+        fprintf(outfp, SET_ROWCOUNT, rowcnt);
     while (fgets(line, BUFSIZ, qfp) != NULL)
         {
         if (!(flags & COMMENT))
@@ -189,7 +189,7 @@ qsub(char *qtag, int flags)
         while ((cptr = strchr(mark, VTAG)) != NULL)
             {
               // Substitute syntax is @@c
-              if (strlen(mark) < (cptr - mark + 1) || cptr[1] != VTAG)
+              if ((int) strlen(mark) < (cptr - mark + 1) || cptr[1] != VTAG)
                 {
                   printf("%.*s", cptr - mark + 2, mark);
                   cptr++;
@@ -204,25 +204,25 @@ qsub(char *qtag, int flags)
             // Skip over the second VTAG
             cptr++;             
             // Print the prefix of the string
-            fprintf(ofp,"%s", mark);
+            fprintf(outfp,"%s", mark);
             switch(*cptr)
                 {
                 case 'b':
                 case 'B':
                     if (!(flags & ANSI))
-                        fprintf(ofp,"%s\n", START_TRAN);
+                        fprintf(outfp,"%s\n", START_TRAN);
                     cptr++;                    
                     break;
                 case 'c':
                 case 'C':
                     if (flags & DBASE)
-                        fprintf(ofp, SET_DBASE, db_name);
+                        fprintf(outfp, SET_DBASE, db_name);
                     cptr++;
                     break;
                 case 'e':
                 case 'E':
                     if (!(flags & ANSI))
-                        fprintf(ofp,"%s\n", END_TRAN);
+                        fprintf(outfp,"%s\n", END_TRAN);
                     cptr++;
                     break;
                 case 'n':
@@ -231,30 +231,30 @@ qsub(char *qtag, int flags)
                         {
                         rowcnt=atoi(++cptr);
                         while (isdigit(*cptr) || *cptr == ' ') cptr++;
-                        fprintf(ofp, SET_ROWCOUNT, rowcnt);
+                        fprintf(outfp, SET_ROWCOUNT, rowcnt);
                         }
                     continue;
                 case 'o':
                 case 'O':
                     if (flags & OUTPUT)
-                        fprintf(ofp,"%s '%s/%s.%d'", SET_OUTPUT, osuff, 
+                        fprintf(outfp,"%s '%s/%s.%d'", SET_OUTPUT, osuff, 
                             qtag, (snum < 0)?0:snum);
                     cptr++;
                     break;
                 case 'q':
                 case 'Q':
-                    fprintf(ofp,"%s", qtag);
+                    fprintf(outfp,"%s", qtag);
                     cptr++;
                     break;
                 case 's':
                 case 'S':
-                    fprintf(ofp,"%d", (snum < 0)?0:snum);
+                    fprintf(outfp,"%d", (snum < 0)?0:snum);
                     cptr++;
                     break;
                 case 'X':
                 case 'x':
                     if (flags & EXPLAIN)
-                        fprintf(ofp, "%s\n", GEN_QUERY_PLAN);
+                        fprintf(outfp, "%s\n", GEN_QUERY_PLAN);
                     cptr++;
                     break;
                 case '1':
@@ -277,13 +277,14 @@ qsub(char *qtag, int flags)
                 }
             mark=cptr;
             }
-        fprintf(ofp,"%s", mark);
+        fprintf(outfp,"%s", mark);
         }
     fclose(qfp);
     fflush(stdout);
-    fflush(ofp);
-    fclose(ofp);    
-    ofp = stdout;
+    if (outfp != stdout) {
+	fflush(outfp);
+	fclose(outfp);    
+    }
     return;
 }
 
