@@ -3,7 +3,7 @@
 using BinaryBuilder
 
 name = "tpch-dbgen"
-version = v"0.0.7"
+version = v"0.0.8"
 
 # Collection of sources required to build tpch-dbgen
 sources = [
@@ -23,6 +23,15 @@ cp -R * $prefix/tpch-dbgen/
 cd ../dbgen
 make CC="$CC"
 cp dbgen qgen $prefix/tpch-dbgen/
+
+# manually add .exe to Windows binaries
+# remove this when we use a later version of BinaryBuilder
+# https://juliapackaging.github.io/BinaryBuilder.jl/dev/reference/#BinaryBuilderBase.ExecutableProduct
+
+if [[ $target = *mingw32* ]]; then
+  mv $prefix/tpch-dbgen/dbgen $prefix/tpch-dbgen/dbgen.exe
+  mv $prefix/tpch-dbgen/qgen $prefix/tpch-dbgen/qgen.exe
+fi
 """
 
 # These are the platforms we will build for by default, unless further
