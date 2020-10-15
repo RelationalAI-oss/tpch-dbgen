@@ -3,7 +3,7 @@
 using BinaryBuilder
 
 name = "tpch-dbgen"
-version = v"0.0.8"
+version = v"0.0.9"
 
 # Collection of sources required to build tpch-dbgen
 sources = [
@@ -30,7 +30,9 @@ cp dbgen qgen $prefix/tpch-dbgen/
 
 if [[ $target = *mingw32* ]]; then
   mv $prefix/tpch-dbgen/dbgen $prefix/tpch-dbgen/dbgen.exe
+  mv $prefix/tpch-dbgen/dbgen-delve $prefix/tpch-dbgen/dbgen-delve.exe
   mv $prefix/tpch-dbgen/qgen $prefix/tpch-dbgen/qgen.exe
+  mv $prefix/tpch-dbgen/qgen-delve $prefix/tpch-dbgen/qgen-delve.exe
 fi
 """
 
