@@ -72,7 +72,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <math.h>
-#ifdef LINUX
+#if (defined(LINUX)||defined(_POSIX_SOURCE))
 #include <stdint.h>
 #endif
 #ifdef IBM

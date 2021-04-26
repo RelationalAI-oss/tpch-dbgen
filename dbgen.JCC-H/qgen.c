@@ -127,7 +127,7 @@ strip_comments(char *line)
 /*
  * FUNCTION qsub(char *qtag, int flags)
  *
- * based on the settings of flags, and the template file $QDIR/qtag.sql
+ * based on the settings of flags, and the template file $QDIR/qtag.delve
  * make the following substitutions to turn a query template into EQT
  *
  *  String      Converted to            Based on
@@ -147,9 +147,8 @@ strip_comments(char *line)
 void
 qsub(char *qtag, int flags)
 {
-static char *line = NULL,
-    *qpath = NULL;
-FILE *qfp;
+static char *line = NULL, *qpath = NULL, *qoutpath = NULL;
+FILE *qfp, *outfp;
 char *cptr,
     *mark,
     *qroot = NULL;
@@ -159,20 +158,27 @@ char *cptr,
         {
         line = malloc(BUFSIZ);
         qpath = malloc(BUFSIZ);
+        qoutpath = malloc(BUFSIZ);
         MALLOC_CHECK(line);
         MALLOC_CHECK(qpath);
+        MALLOC_CHECK(qoutpath);
         }
 
     qroot = env_config(QDIR_TAG, QDIR_DFLT);
-    sprintf(qpath, "%s%c%s.sql", 
-		qroot, PATH_SEP, qtag);
+    sprintf(qpath, "%s%c%s.delve", qroot, PATH_SEP, qtag);
+    sprintf(qoutpath, "%s%c%s.delve", query_output_dir, PATH_SEP, qtag);
     qfp = fopen(qpath, "r");
+    if(query_output_dir == NULL) {
+        outfp = stdout;
+    } else {
+        outfp = fopen(qoutpath, "w");
+    }
     OPEN_CHECK(qfp, qpath);
 
     rowcnt = rowcnt_dflt[qnum];
     varsub(qnum, 0, flags); /* set the variables */
     if (flags & DFLT_NUM)
-        fprintf(ofp, SET_ROWCOUNT, rowcnt);
+        fprintf(outfp, SET_ROWCOUNT, rowcnt);
     while (fgets(line, BUFSIZ, qfp) != NULL)
         {
         if (!(flags & COMMENT))
@@ -180,27 +186,40 @@ char *cptr,
         mark = line;
         while ((cptr = strchr(mark, VTAG)) != NULL)
             {
+               // Substitute syntax is @@c
+              if ((int) strlen(mark) < (cptr - mark + 1) || cptr[1] != VTAG)
+                {
+                  printf("%.*s", cptr - mark + 2, mark);
+                  cptr++;
+                  cptr++;
+                  mark = cptr;
+                  continue;
+                }
+            // Nul terminate the prefix for printing    
             *cptr = '\0';
+            // Skip over the nul (which was the VTAG)
              cptr++;
-            fprintf(ofp,"%s", mark);
+            // Skip over the second VTAG
+            cptr++;
+            fprintf(outfp,"%s", mark);
             switch(*cptr)
                 {
                 case 'b':
                 case 'B':
                     if (!(flags & ANSI))
-                        fprintf(ofp,"%s\n", START_TRAN);
+                        fprintf(outfp,"%s\n", START_TRAN);
                     cptr++;
                     break;
                 case 'c':
                 case 'C':
                     if (flags & DBASE)
-                        fprintf(ofp, SET_DBASE, db_name);
+                        fprintf(outfp, SET_DBASE, db_name);
                     cptr++;
                     break;
                 case 'e':
                 case 'E':
                     if (!(flags & ANSI))
-                        fprintf(ofp,"%s\n", END_TRAN);
+                        fprintf(outfp,"%s\n", END_TRAN);
                     cptr++;
                     break;
                 case 'n':
@@ -209,30 +228,30 @@ char *cptr,
                         {
                         rowcnt=atoi(++cptr);
                         while (isdigit(*cptr) || *cptr == ' ') cptr++;
-                        fprintf(ofp, SET_ROWCOUNT, rowcnt);
+                        fprintf(outfp, SET_ROWCOUNT, rowcnt);
                         }
                     continue;
                 case 'o':
                 case 'O':
                     if (flags & OUTPUT)
-                        fprintf(ofp,"%s '%s/%s.%d'", SET_OUTPUT, osuff, 
+                        fprintf(outfp,"%s '%s/%s.%d'", SET_OUTPUT, osuff, 
                             qtag, (snum < 0)?0:snum);
                     cptr++;
                     break;
                 case 'q':
                 case 'Q':
-                    fprintf(ofp,"%s", qtag);
+                    fprintf(outfp,"%s", qtag);
                     cptr++;
                     break;
                 case 's':
                 case 'S':
-                    fprintf(ofp,"%d", (snum < 0)?0:snum);
+                    fprintf(outfp,"%d", (snum < 0)?0:snum);
                     cptr++;
                     break;
                 case 'X':
                 case 'x':
                     if (flags & EXPLAIN)
-                        fprintf(ofp, "%s\n", GEN_QUERY_PLAN);
+                        fprintf(outfp, "%s\n", GEN_QUERY_PLAN);
                     cptr++;
                     break;
 		case '1':
@@ -255,10 +274,14 @@ char *cptr,
                 }
             mark=cptr;
             }
-        fprintf(ofp,"%s", mark);
+        fprintf(outfp,"%s", mark);
         }
     fclose(qfp);
     fflush(stdout);
+    if (outfp != stdout) {
+       fflush(outfp);
+       fclose(outfp);
+    }
     return;
 }
 
@@ -312,7 +335,7 @@ process_options(int cnt, char **args)
 {
     int flag;
 
-    while((flag = getopt(cnt, args, "ab:cdkhi:n:Nl:o:p:r:s:t:vx")) != -1)
+    while((flag = getopt(cnt, args, "ab:cdkhi:n:Nl:o:Q:p:r:s:t:vx")) != -1)
         switch(flag)
             {
             case 'a':   /* use ANSI semantics */
@@ -364,6 +387,11 @@ process_options(int cnt, char **args)
                 MALLOC_CHECK(osuff);
                 strcpy(osuff, optarg);
                 flags |=OUTPUT;
+                break;
+            case 'Q':   /* set the output path */
+                query_output_dir = malloc((int)strlen(optarg) + 1);
+                MALLOC_CHECK(query_output_dir);
+                strcpy(query_output_dir, optarg);
                 break;
             case 'p':   /* permutation for a given stream */
                 snum = atoi(optarg);
@@ -441,7 +469,7 @@ int main(int ac, char **av)
     process_options(ac, av);
     if (flags & VERBOSE)
         fprintf(ofp, 
-	    "-- TPC %s Parameter Substitution (Version %d.%d.%d build %d)\n",
+	    "// TPC %s Parameter Substitution (Version %d.%d.%d build %d)\n",
             NAME, VERSION, RELEASE, PATCH, BUILD);
 
     setup();
@@ -458,10 +486,10 @@ int main(int ac, char **av)
 			Seed[0].value = NextRand(Seed[0].value);
 			Seed[i].value = Seed[0].value;
 			}
-		printf("-- using %ld as a seed to the RNG\n", rndm);
+		printf("// using %ld as a seed to the RNG\n", rndm);
 		}
     else
-        printf("-- using default substitutions\n");
+        printf("// using default substitutions\n");
     
     if (flags & INIT)           /* init stream with ifile */
         {

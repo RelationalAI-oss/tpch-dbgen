@@ -41,7 +41,7 @@
 /*
  * general defines
  */
-#define VTAG            ':'          /* flags a variable substitution */
+#define VTAG            '@'          /* flags a variable substitution */
 #define ofp             stdout       /* make the routine a filter */
 #define QDIR_TAG        "DSS_QUERY"  /* variable to point to queries */
 #define QDIR_DFLT       "."          /* and its default */
@@ -119,6 +119,7 @@
 EXTERN int flags;
 EXTERN int s_cnt;
 EXTERN char *osuff;
+EXTERN char *query_output_dir;
 EXTERN int stream;
 EXTERN char *lfile;
 EXTERN char *ifile;
