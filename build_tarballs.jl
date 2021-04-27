@@ -7,14 +7,13 @@ version = v"0.0.9"
 
 # Collection of sources required to build tpch-dbgen
 sources = [
-    ".",
+   DirectorySource("dbgen-delve", target="dbgen-delve"),
+   DirectorySource("dbgen", target="dbgen"),
+   DirectorySource("dbgen.JCC-H", target="dbgen.JCC-H"),
 ]
 
 # Bash recipe for building across all platforms
 script = raw"""
-cd $WORKSPACE/srcdir
-pwd
-ls -l 
 cd dbgen-delve
 make CC="$CC"
 mkdir $prefix/tpch-dbgen
@@ -24,6 +23,10 @@ cd ../dbgen
 make CC="$CC"
 cp dbgen qgen $prefix/tpch-dbgen/
 
+cd ../dbgen.JCC-H
+make CC="$CC"
+cp dbgen-jcch qgen-jcch $prefix/tpch-dbgen/
+
 # manually add .exe to Windows binaries
 # remove this when we use a later version of BinaryBuilder
 # https://juliapackaging.github.io/BinaryBuilder.jl/dev/reference/#BinaryBuilderBase.ExecutableProduct
@@ -31,8 +34,10 @@ cp dbgen qgen $prefix/tpch-dbgen/
 if [[ $target = *mingw32* ]]; then
   mv $prefix/tpch-dbgen/dbgen $prefix/tpch-dbgen/dbgen.exe
   mv $prefix/tpch-dbgen/dbgen-delve $prefix/tpch-dbgen/dbgen-delve.exe
+  mv $prefix/tpch-dbgen/dbgen-jcch $prefix/tpch-dbgen/dbgen-jcch.exe
   mv $prefix/tpch-dbgen/qgen $prefix/tpch-dbgen/qgen.exe
   mv $prefix/tpch-dbgen/qgen-delve $prefix/tpch-dbgen/qgen-delve.exe
+  mv $prefix/tpch-dbgen/qgen-jcch $prefix/tpch-dbgen/qgen-jcch.exe
 fi
 """
 
@@ -45,9 +50,11 @@ platforms = [
 ]
 
 # The products that we will ensure are always built
-products(prefix) = [
-    ExecutableProduct(prefix, "qgen-delve", :qgen_delve),
-    ExecutableProduct(prefix, "dbgen-delve", :dbgen_delve)
+products = [
+    ExecutableProduct("qgen-delve", :qgen_delve, "tpch-dbgen"),
+    ExecutableProduct("dbgen-delve", :dbgen_delve, "tpch-dbgen"),
+    ExecutableProduct("qgen-jcch", :qgen_jcch, "tpch-dbgen"),
+    ExecutableProduct("dbgen-jcch", :dbgen_jcch, "tpch-dbgen")
 ]
 
 # Dependencies that must be installed before this package can be built
@@ -56,5 +63,5 @@ dependencies = [
 ]
 
 # Build the tarballs, and possibly a `build.jl` as well.
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies, require_license=false)
 
