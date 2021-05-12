@@ -3,11 +3,12 @@
 using BinaryBuilder
 
 name = "tpch-dbgen"
-version = v"0.0.9"
+version = v"0.0.10"
 
 # Collection of sources required to build tpch-dbgen
 sources = [
-    ".",
+   DirectorySource("dbgen-rel", target="dbgen-rel"),
+   DirectorySource("dbgen", target="dbgen"),
 ]
 
 # Bash recipe for building across all platforms
@@ -15,7 +16,7 @@ script = raw"""
 cd $WORKSPACE/srcdir
 pwd
 ls -l 
-cd dbgen-delve
+cd dbgen-rel
 make CC="$CC"
 mkdir $prefix/tpch-dbgen
 cp -R * $prefix/tpch-dbgen/
@@ -30,8 +31,9 @@ cp dbgen qgen $prefix/tpch-dbgen/
 
 if [[ $target = *mingw32* ]]; then
   mv $prefix/tpch-dbgen/dbgen $prefix/tpch-dbgen/dbgen.exe
-  mv $prefix/tpch-dbgen/dbgen-delve $prefix/tpch-dbgen/dbgen-delve.exe
+  mv $prefix/tpch-dbgen/dbgen-rel $prefix/tpch-dbgen/dbgen-rel.exe
   mv $prefix/tpch-dbgen/qgen $prefix/tpch-dbgen/qgen.exe
+  mv $prefix/tpch-dbgen/qgen-rel $prefix/tpch-dbgen/qgen-rel.exe
   mv $prefix/tpch-dbgen/qgen-delve $prefix/tpch-dbgen/qgen-delve.exe
 fi
 """
@@ -45,9 +47,10 @@ platforms = [
 ]
 
 # The products that we will ensure are always built
-products(prefix) = [
-    ExecutableProduct(prefix, "qgen-delve", :qgen_delve),
-    ExecutableProduct(prefix, "dbgen-delve", :dbgen_delve)
+products = [
+    ExecutableProduct("qgen-rel", :qgen_rel, "tpch-dbgen"),
+    ExecutableProduct("dbgen-rel", :dbgen_rel, "tpch-dbgen"),
+    ExecutableProduct("qgen-delve", :qgen_delve, "tpch-dbgen"),
 ]
 
 # Dependencies that must be installed before this package can be built
@@ -56,5 +59,5 @@ dependencies = [
 ]
 
 # Build the tarballs, and possibly a `build.jl` as well.
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies, require_license=false)
 
