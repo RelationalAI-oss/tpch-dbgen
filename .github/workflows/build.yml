@@ -1,0 +1,19 @@
+name: build
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1.0.0
+    - uses: julia-actions/setup-julia@v1
+      with:
+        version: 1.5.4
+    - run: julia -e 'using Pkg; Pkg.add("BinaryBuilder")'
+    - run: BINARYBUILDER_AUTOMATIC_APPLE=true julia build_tarballs.jl
+    - uses: actions/upload-artifact@v2
+      with:
+        name: products
+        path: products/
