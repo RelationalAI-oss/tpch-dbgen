@@ -133,9 +133,10 @@ BUILD=`grep BUILD release.h | cut -f3 -d' '`
 NEW_BUILD=`expr ${BUILD} + 1`
 TREE_ROOT=/tmp/tree
 #
-PROG1 = dbgen-delve$(EXE)
-PROG2 = qgen-delve$(EXE)
-PROGS = $(PROG1) $(PROG2)
+PROG1 = dbgen-rel$(EXE)
+PROG2 = qgen-rel$(EXE)
+PROG3 = qgen-delve$(EXE)
+PROGS = $(PROG1) $(PROG2) $(PROG3)
 #
 HDR1 = dss.h rnd.h config.h dsstypes.h shared.h bcd2.h rng64.h release.h
 HDR2 = tpcd.h permute.h
@@ -144,12 +145,15 @@ HDR  = $(HDR1) $(HDR2)
 SRC1 = build.c driver.c bm_utils.c rnd.c print.c load_stub.c bcd2.c \
 	speed_seed.c text.c permute.c rng64.c
 SRC2 = qgen.c varsub.c 
+SRC3 = qgen-delve.c varsub.c
 SRC  = $(SRC1) $(SRC2)
 #
 OBJ1 = build$(OBJ) driver$(OBJ) bm_utils$(OBJ) rnd$(OBJ) print$(OBJ) \
 	load_stub$(OBJ) bcd2$(OBJ) speed_seed$(OBJ) text$(OBJ) permute$(OBJ) \
 	rng64$(OBJ)
 OBJ2 = build$(OBJ) bm_utils$(OBJ) qgen$(OBJ) rnd$(OBJ) varsub$(OBJ) \
+	text$(OBJ) bcd2$(OBJ) permute$(OBJ) speed_seed$(OBJ) rng64$(OBJ)
+OBJ3 = build$(OBJ) bm_utils$(OBJ) qgen-delve$(OBJ) rnd$(OBJ) varsub$(OBJ) \
 	text$(OBJ) bcd2$(OBJ) permute$(OBJ) speed_seed$(OBJ) rng64$(OBJ)
 OBJS = $(OBJ1) $(OBJ2)
 #
@@ -161,7 +165,7 @@ OTHER=makefile.suite $(SETS) $(DDL) $(WINDOWS_IDE)
 # case is *important* in TEST_RES
 TEST_RES = O.res L.res c.res s.res P.res S.res n.res r.res
 #
-DBGENSRC=$(SRC1) $(HDR1) $(OTHER) $(DOC) $(SRC2) $(HDR2) $(SRC3)
+DBGENSRC=$(SRC1) $(HDR1) $(OTHER) $(DOC) $(SRC2) $(HDR2)
 FQD=queries/1.sql queries/2.sql queries/3.sql queries/4.sql queries/5.sql queries/6.sql queries/7.sql \
 	queries/8.sql queries/9.sql queries/10.sql queries/11.sql queries/12.sql queries/13.sql \
 	queries/14.sql queries/15.sql queries/16.sql queries/17.sql queries/18.sql queries/19.sql queries/20.sql \
@@ -183,6 +187,9 @@ $(PROG1): $(OBJ1) $(SETS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ1) $(LIBS)
 $(PROG2): permute.h $(OBJ2) 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ2) $(LIBS)
+$(PROG3): permute.h $(OBJ3) 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ3) $(LIBS)
+
 clean:
 	rm -f $(PROGS) $(OBJS) $(JUNK)
 lint:
@@ -202,3 +209,4 @@ release:
 rnd$(OBJ): rnd.h
 $(OBJ1): $(HDR1)
 $(OBJ2): dss.h tpcd.h config.h rng64.h release.h
+$(OBJ3): dss.h tpcd.h config.h rng64.h release.h

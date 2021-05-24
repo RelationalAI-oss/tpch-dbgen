@@ -3,18 +3,21 @@
 using BinaryBuilder
 
 name = "tpch-dbgen"
-version = v"0.0.9"
+version = v"0.0.10"
 
 # Collection of sources required to build tpch-dbgen
 sources = [
-   DirectorySource("dbgen-delve", target="dbgen-delve"),
+   DirectorySource("dbgen-rel", target="dbgen-rel"),
    DirectorySource("dbgen", target="dbgen"),
    DirectorySource("dbgen.JCC-H", target="dbgen.JCC-H"),
 ]
 
 # Bash recipe for building across all platforms
 script = raw"""
-cd dbgen-delve
+cd $WORKSPACE/srcdir
+pwd
+ls -l 
+cd dbgen-rel
 make CC="$CC"
 mkdir $prefix/tpch-dbgen
 cp -R * $prefix/tpch-dbgen/
@@ -33,9 +36,10 @@ cp dbgen-jcch qgen-jcch $prefix/tpch-dbgen/
 
 if [[ $target = *mingw32* ]]; then
   mv $prefix/tpch-dbgen/dbgen $prefix/tpch-dbgen/dbgen.exe
-  mv $prefix/tpch-dbgen/dbgen-delve $prefix/tpch-dbgen/dbgen-delve.exe
+  mv $prefix/tpch-dbgen/dbgen-rel $prefix/tpch-dbgen/dbgen-rel.exe
   mv $prefix/tpch-dbgen/dbgen-jcch $prefix/tpch-dbgen/dbgen-jcch.exe
   mv $prefix/tpch-dbgen/qgen $prefix/tpch-dbgen/qgen.exe
+  mv $prefix/tpch-dbgen/qgen-rel $prefix/tpch-dbgen/qgen-rel.exe
   mv $prefix/tpch-dbgen/qgen-delve $prefix/tpch-dbgen/qgen-delve.exe
   mv $prefix/tpch-dbgen/qgen-jcch $prefix/tpch-dbgen/qgen-jcch.exe
 fi
@@ -51,8 +55,9 @@ platforms = [
 
 # The products that we will ensure are always built
 products = [
+    ExecutableProduct("qgen-rel", :qgen_rel, "tpch-dbgen"),
+    ExecutableProduct("dbgen-rel", :dbgen_rel, "tpch-dbgen"),
     ExecutableProduct("qgen-delve", :qgen_delve, "tpch-dbgen"),
-    ExecutableProduct("dbgen-delve", :dbgen_delve, "tpch-dbgen"),
     ExecutableProduct("qgen-jcch", :qgen_jcch, "tpch-dbgen"),
     ExecutableProduct("dbgen-jcch", :dbgen_jcch, "tpch-dbgen")
 ]
