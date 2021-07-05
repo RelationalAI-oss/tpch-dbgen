@@ -1,7 +1,7 @@
 ################
 ## CHANGE NAME OF ANSI COMPILER HERE
 ################
-CC      = gcc 
+CC      =
 # Current values for DATABASE are: INFORMIX, DB2, TDAT (Teradata)
 #                                  SQLSERVER, SYBASE, ORACLE, VECTORWISE
 # Current values for MACHINE are:  ATT, DOS, HP, IBM, ICL, MVS, 
@@ -11,8 +11,8 @@ DATABASE= VECTORWISE
 MACHINE = LINUX
 WORKLOAD = TPCH
 #
-CFLAGS	= -g -DDBNAME=\"dss\" -D$(MACHINE) -D$(DATABASE) -D$(WORKLOAD) -DRNG_TEST -D_FILE_OFFSET_BITS=64 -DEOL_HANDLING -DJCCH_SKEW=1
-LDFLAGS = -O
+CFLAGS	= -g -O3 -DDBNAME=\"dss\" -D$(MACHINE) -D$(DATABASE) -D$(WORKLOAD) -DRNG_TEST -D_FILE_OFFSET_BITS=64 -DEOL_HANDLING -DJCCH_SKEW=1
+LDFLAGS = -O3
 # The OBJ,EXE and LIB macros will need to be changed for compilation under
 #  Windows NT
 OBJ     = .o
