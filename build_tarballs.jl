@@ -9,6 +9,7 @@ version = v"0.0.10"
 sources = [
    DirectorySource("dbgen-rel", target="dbgen-rel"),
    DirectorySource("dbgen", target="dbgen"),
+   DirectorySource("dbgen.JCC-H", target="dbgen.JCC-H"),
 ]
 
 # Bash recipe for building across all platforms
@@ -25,6 +26,10 @@ cd ../dbgen
 make CC="$CC"
 cp dbgen qgen $prefix/tpch-dbgen/
 
+cd ../dbgen.JCC-H
+make CC="$CC"
+cp dbgen-jcch qgen-jcch $prefix/tpch-dbgen/
+
 # manually add .exe to Windows binaries
 # remove this when we use a later version of BinaryBuilder
 # https://juliapackaging.github.io/BinaryBuilder.jl/dev/reference/#BinaryBuilderBase.ExecutableProduct
@@ -32,18 +37,20 @@ cp dbgen qgen $prefix/tpch-dbgen/
 if [[ $target = *mingw32* ]]; then
   mv $prefix/tpch-dbgen/dbgen $prefix/tpch-dbgen/dbgen.exe
   mv $prefix/tpch-dbgen/dbgen-rel $prefix/tpch-dbgen/dbgen-rel.exe
+  mv $prefix/tpch-dbgen/dbgen-jcch $prefix/tpch-dbgen/dbgen-jcch.exe
   mv $prefix/tpch-dbgen/qgen $prefix/tpch-dbgen/qgen.exe
   mv $prefix/tpch-dbgen/qgen-rel $prefix/tpch-dbgen/qgen-rel.exe
   mv $prefix/tpch-dbgen/qgen-delve $prefix/tpch-dbgen/qgen-delve.exe
+  mv $prefix/tpch-dbgen/qgen-jcch $prefix/tpch-dbgen/qgen-jcch.exe
 fi
 """
 
 # These are the platforms we will build for by default, unless further
 # platforms are passed in on the command line
 platforms = [
-    Linux(:x86_64, libc=:glibc),
-    MacOS(:x86_64),
-    Windows(:x86_64)
+    Platform("x86_64", "linux"; libc="glibc"),
+    Platform("x86_64", "macos"),
+    #Platform("x86_64", "windows")
 ]
 
 # The products that we will ensure are always built
@@ -51,6 +58,8 @@ products = [
     ExecutableProduct("qgen-rel", :qgen_rel, "tpch-dbgen"),
     ExecutableProduct("dbgen-rel", :dbgen_rel, "tpch-dbgen"),
     ExecutableProduct("qgen-delve", :qgen_delve, "tpch-dbgen"),
+    ExecutableProduct("qgen-jcch", :qgen_jcch, "tpch-dbgen"),
+    ExecutableProduct("dbgen-jcch", :dbgen_jcch, "tpch-dbgen")
 ]
 
 # Dependencies that must be installed before this package can be built

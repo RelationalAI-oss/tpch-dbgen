@@ -10,7 +10,7 @@ jobs:
     - uses: actions/checkout@v1.0.0
     - uses: julia-actions/setup-julia@v1
       with:
-        version: 1.5.4
+        version: 1.6.1
     - run: julia -e 'using Pkg; Pkg.add("BinaryBuilder")'
     - run: BINARYBUILDER_AUTOMATIC_APPLE=true julia build_tarballs.jl
     - uses: actions/upload-artifact@v2
