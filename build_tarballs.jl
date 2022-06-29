@@ -2,8 +2,8 @@
 # `julia build_tarballs.jl --help` to see a usage message.
 using BinaryBuilder
 
-name = "tpch-dbgen"
-version = v"0.0.10"
+name = "tpch_dbgen"
+version = v"0.0.11"
 
 # Collection of sources required to build tpch-dbgen
 sources = [
