@@ -50,7 +50,7 @@ fi
 platforms = [
     Platform("x86_64", "linux"; libc="glibc"),
     Platform("x86_64", "macos"),
-    Platforma("aarch64", "macos"),
+    Platform("aarch64", "macos"),
     #Platform("x86_64", "windows")
 ]
 
