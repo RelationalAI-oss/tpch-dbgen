@@ -50,6 +50,7 @@ fi
 platforms = [
     Platform("x86_64", "linux"; libc="glibc"),
     Platform("x86_64", "macos"),
+    Platforma("aarch64", "macos"),
     #Platform("x86_64", "windows")
 ]
 
@@ -68,5 +69,5 @@ dependencies = [
 ]
 
 # Build the tarballs, and possibly a `build.jl` as well.
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies, require_license=false)
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies, require_license=false, julia_compat="1.7")
 
