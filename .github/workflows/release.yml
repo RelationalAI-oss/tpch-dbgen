@@ -18,7 +18,7 @@ jobs:
       - run: julia -e 'using Pkg; Pkg.add("BinaryBuilder")'
       - run: BINARYBUILDER_AUTOMATIC_APPLE=true julia build_tarballs.jl
       - name: release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1.10.0
         id: create_release
         with:
           generateReleaseNotes: true
