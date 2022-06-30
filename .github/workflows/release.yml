@@ -19,8 +19,8 @@ jobs:
       - run: BINARYBUILDER_AUTOMATIC_APPLE=true julia build_tarballs.jl
       - name: release
         uses: ncipollo/release-action@v1.10.0
-        id: create_release
         with:
+          tag: ${{ env.GIT_TAG }}
           generateReleaseNotes: true
           artifactErrorsFailBuild: true
           artifactContentType: application/gzip
