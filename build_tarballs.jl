@@ -2,8 +2,8 @@
 # `julia build_tarballs.jl --help` to see a usage message.
 using BinaryBuilder
 
-name = "tpch-dbgen"
-version = v"0.0.10"
+name = "tpch_dbgen"
+version = v"0.0.11"
 
 # Collection of sources required to build tpch-dbgen
 sources = [
@@ -50,6 +50,7 @@ fi
 platforms = [
     Platform("x86_64", "linux"; libc="glibc"),
     Platform("x86_64", "macos"),
+    Platform("aarch64", "macos"),
     #Platform("x86_64", "windows")
 ]
 
@@ -68,5 +69,5 @@ dependencies = [
 ]
 
 # Build the tarballs, and possibly a `build.jl` as well.
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies, require_license=false)
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies, require_license=false, julia_compat="1.7")
 
